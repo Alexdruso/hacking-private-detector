@@ -1,4 +1,12 @@
-# Private Detector
+# (Hacking) Private Detector
+
+## Introduction
+
+Google's Deep Dream has been around for more than 5 years now, and in between it has revolutionized not ony the concept of what we call art, but also out understanding of neural networks. The idea behind it is simple: instead of training a neural netwotk to perform a task, freeze the model and apply gradiend ascend updates to the input to maximize a particular activation function (e.g. update an input image to maximize the chance of it representing a cat).
+
+As Bumble recently released *Private Detector*™, an image classifier that can detect lewd images, the peculiarity of it caught my attention and led to the subsequent question: what if we applied Deep Dream to Private Detector? Besides the goliardic nature of the experiment, the results might raise questions on the ethics behind releasing a model trained on such sensitive content.
+
+Below, you can find the original README of the repository.
 
 This is the repo for Bumble's *Private Detector*™ model - an image classifier that can detect lewd images.
 
