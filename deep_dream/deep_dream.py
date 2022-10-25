@@ -5,6 +5,7 @@ The code might be subject to further improvements and modifications in the futur
 import tensorflow as tf
 from utils.loss import calc_loss
 
+
 class DeepDream(tf.Module):
     def __init__(self, model):
         super().__init__()
