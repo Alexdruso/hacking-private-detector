@@ -2,6 +2,7 @@ import argparse
 import os
 
 import tensorflow as tf
+from private_detector.private_detector import PrivateDetector
 
 from private_detector.utils.preprocess import preprocess_for_evaluation
 
@@ -38,13 +39,27 @@ def lewdify(
         input_path: str,
         output_path: str
 ) -> None:
-    # TODO implement and test model loading (tf.saved_model.load(model) does not restore custom gradients :))
     #images_names = os.listdir(input_path)
     # images_paths = map(lambda name: os.path.join(input_path, name), images_names)
     # for image_path in image_paths:
     #    image = read_image(image_path)
 
     os.makedirs(output_path, exist_ok=True)
+
+    model = PrivateDetector(
+        initial_learning_rate=1.,
+        class_labels=['lewd', 'not_lewd'],
+        checkpoint_dir='',
+        batch_size=1,
+        reg_loss_weight=1.,
+        use_fp16=True,
+        tensorboard_log_dir='',
+        eval_threshold=2
+    )
+
+    restore_path = tf.train.latest_checkpoint(restore_path)
+    model.restore(restore_path=restore_path)
+
     return
 
 
@@ -56,7 +71,7 @@ if __name__ == '__main__':
         '--restore_path',
         type=str,
         help='Location of SavedModel to load',
-        default='saved_checkpoint/ckpt-0.9375-14.index'
+        default='saved_checkpoint'
     )
     parser.add_argument(
         '--input_path',
