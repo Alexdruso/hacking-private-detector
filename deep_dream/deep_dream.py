@@ -3,7 +3,7 @@ The code for DeepDream is (at the moment) taken from https://www.tensorflow.org/
 The code might be subject to further improvements and modifications in the future.
 """
 import tensorflow as tf
-from utils.loss import calc_loss
+from .utils.loss import calc_loss
 
 
 class DeepDream(tf.Module):

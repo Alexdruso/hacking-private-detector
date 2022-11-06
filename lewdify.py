@@ -5,6 +5,7 @@ import tensorflow as tf
 from private_detector.private_detector import PrivateDetector
 
 from private_detector.utils.preprocess import preprocess_for_evaluation
+from deep_dream.deep_dream import DeepDream
 
 
 # TODO refactor to remove code duplication :)
@@ -28,7 +29,7 @@ def read_image(filename: str) -> tf.Tensor:
     image = preprocess_for_evaluation(
         image,
         480,
-        tf.float16
+        tf.float32
     )
 
     return image
@@ -60,6 +61,24 @@ def lewdify(
     restore_path = tf.train.latest_checkpoint(restore_path)
     model.restore(restore_path=restore_path)
 
+    model = DeepDream(model.model)
+
+
+    images_names = os.listdir(input_path)
+
+    images_paths = map(lambda name: os.path.join(input_path, name), images_names)
+    for image_path in images_paths:
+        image = read_image(image_path)
+
+        new_image, loss = model(
+            image,
+            step_size=tf.constant(1., dtype=tf.float32),
+            steps=tf.constant(1, dtype=tf.int32)
+        )
+
+        print(new_image.shape)
+        print(loss)
+
     return
 
 
@@ -77,7 +96,7 @@ if __name__ == '__main__':
         '--input_path',
         type=str,
         help='Paths to image paths to predict for',
-        default='sonny.jpg'
+        default='input'
     )
     parser.add_argument(
         '--output_path',
