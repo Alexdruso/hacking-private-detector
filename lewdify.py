@@ -2,9 +2,12 @@ import argparse
 import os
 
 import tensorflow as tf
+
+tf.compat.v1.enable_eager_execution()
 from private_detector.private_detector import PrivateDetector
 
 from private_detector.utils.preprocess import preprocess_for_evaluation
+from deep_dream.utils.postprocess import postprocess_for_evaluation
 from deep_dream.deep_dream import DeepDream
 
 
@@ -35,15 +38,21 @@ def read_image(filename: str) -> tf.Tensor:
     return image
 
 
+def save_image(filename: str, image) -> None:
+    image = postprocess_for_evaluation(
+        image,
+        tf.uint8
+    )
+
+    image = tf.io.encode_jpeg(image)
+    tf.io.write_file(filename, image)
+
+
 def lewdify(
         restore_path: str,
         input_path: str,
         output_path: str
 ) -> None:
-    #images_names = os.listdir(input_path)
-    # images_paths = map(lambda name: os.path.join(input_path, name), images_names)
-    # for image_path in image_paths:
-    #    image = read_image(image_path)
 
     os.makedirs(output_path, exist_ok=True)
 
@@ -63,21 +72,20 @@ def lewdify(
 
     model = DeepDream(model.model)
 
-
     images_names = os.listdir(input_path)
 
     images_paths = map(lambda name: os.path.join(input_path, name), images_names)
     for image_path in images_paths:
         image = read_image(image_path)
 
-        new_image, loss = model(
+        loss, new_image = model(
             image,
-            step_size=tf.constant(1., dtype=tf.float32),
-            steps=tf.constant(1, dtype=tf.int32)
+            step_size=tf.constant(0.01, dtype=tf.float32),
+            steps=tf.constant(100, dtype=tf.int32)
         )
 
         print(new_image.shape)
-        print(loss)
+        save_image(os.path.join('output', os.path.basename(image_path)), new_image)
 
     return
 

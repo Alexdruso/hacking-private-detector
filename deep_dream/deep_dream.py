@@ -37,5 +37,4 @@ class DeepDream(tf.Module):
             # You can update the image by directly adding the gradients (because they're the same shape!)
             img = img + gradients * step_size
             img = tf.clip_by_value(img, -1, 1)
-
         return loss, img
